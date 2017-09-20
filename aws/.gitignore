@@ -1,0 +1,7 @@
+vendor/**/.git
+vendor/**/
+!vendor/vendor.json
+
+aws-ec2-ubuntu
+aws-ec2-ubuntu.tfstate
+*.tfstate
