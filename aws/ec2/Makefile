@@ -6,6 +6,9 @@ build:
 clean:
 	$(RM) ec2
 
+clean-all: clean
+	$(RM) *.tfstate
+
 describe-key-pairs:
 	aws ec2 describe-key-pairs --query 'KeyPairs[*].KeyName' --output table
 

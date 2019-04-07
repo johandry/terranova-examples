@@ -1,4 +1,4 @@
-# Terranova Example
+# Terranova Example: AWS EC2 instances
 
 This example is to create, scale or terminate AWS EC2 instances using the Terranova package. The code is explained in the blog post [Terranova: Using Terraform from Go](http://blog.johandry.com/post/terranova-terraform-from-go/).
 
