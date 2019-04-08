@@ -18,28 +18,46 @@ import (
 
 // Code is the Terraform code to execute
 const Code = `
-  variable "count" 	  { default = 2 }
-  variable "key_name" {}
-  provider "aws" {
-    region        = "us-west-2"
-  }
-  resource "aws_instance" "server" {
-    instance_type = "t2.micro"
-    ami           = "ami-6e1a0117"
-    count         = "${var.count}"
-    key_name      = "${var.key_name}"
-  }
+variable "count" 	          { default = 2 }
+variable "public_key_file"  { default = "~/.ssh/id_rsa.pub" }
+variable "private_key_file" { default = "~/.ssh/id_rsa" }
+locals {
+  public_key    = "${file(pathexpand(var.public_key_file))}"
+  private_key   = "${file(pathexpand(var.private_key_file))}"
+}
+provider "aws" {
+  region        = "us-west-2"
+}
+resource "aws_instance" "server" {
+  instance_type = "t2.micro"
+  ami           = "ami-6e1a0117"
+  count         = "${var.count}"
+  key_name      = "server_key"
+
   provisioner "file" {
     content     = "ami used: ${self.ami}"
     destination = "/tmp/file.log"
+
+    connection {
+      user        = "ubuntu"
+      private_key = "${local.private_key}"
+    }
   }
+}
+resource "aws_key_pair" "keypair" {
+  key_name    = "server_key"
+  public_key  = "${local.public_key}"
+}
 `
 
-const stateFile = "tf.state"
+const (
+	stateFile = "tf.state"
+)
 
 var (
-	count   int
-	keyName string
+	count       int
+	pubKeyFile  string
+	privKeyFile string
 )
 
 // Platformer store all the information needed by Terraform
@@ -53,7 +71,8 @@ type Platformer struct {
 
 func main() {
 	flag.IntVar(&count, "count", 2, "number of instances to create. Set to '0' to terminate them all.")
-	flag.StringVar(&keyName, "keyname", "", "keyname to access the instances.")
+	flag.StringVar(&pubKeyFile, "pub", "", "public key file to create the AWS Key Pair")
+	flag.StringVar(&privKeyFile, "priv", "", "private key file to connect to the new AWS EC2 instances")
 	flag.Parse()
 
 	var state bytes.Buffer
@@ -61,9 +80,15 @@ func main() {
 	p := &Platformer{
 		Code: Code,
 		Vars: map[string]interface{}{
-			"count":    count,
-			"key_name": keyName,
+			"count": count,
 		},
+	}
+
+	if len(pubKeyFile) != 0 {
+		p.Vars["public_key_file"] = pubKeyFile
+	}
+	if len(privKeyFile) != 0 {
+		p.Vars["private_key_file"] = privKeyFile
 	}
 
 	// If the file exists, read the state from the state file
@@ -113,6 +138,11 @@ func main() {
 	// Finally make the module load the
 	if err := mod.Load(s); err != nil {
 		log.Fatalf("Failed loading modules. %s", err)
+	}
+
+	// Optionally, you can validate the loaded code if it has some user input
+	if err := mod.Validate().Err(); err != nil {
+		log.Fatalf("Failed Terraform code validation. %s", err)
 	}
 
 	// Add Providers:
