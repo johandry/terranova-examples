@@ -4,7 +4,6 @@ import (
 	"flag"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/hashicorp/terraform/builtin/provisioners/file"
 	"github.com/johandry/terranova"
@@ -30,7 +29,7 @@ func main() {
 	platform, err := terranova.NewPlatform(code).
 		AddProvider("aws", aws.Provider()).
 		AddProvisioner("file", file.Provisioner()).
-		Var("count", strconv.Itoa(count)).
+		Var("count", count).
 		ReadStateFromFile(stateFilename)
 
 	if len(pubKeyFile) != 0 {
