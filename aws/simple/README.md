@@ -26,6 +26,6 @@ rm demo.pem
 To terminate the instance set the `count` variable to `0`, build it (`go build`) and execute it, or execute the following AWS CLI command:
 
 ```bash
-ip=$(grep '"public_ip"' simple.tfstate | sed 's/.*: "\(.*\)",/\1/')
-aws ec2 terminate-instances --instance-ids $ip
+id=$(grep '"id"' simple.tfstate | sed 's/.*: "\(.*\)",/\1/' | uniq)
+aws ec2 terminate-instances --instance-ids $id
 ```
