@@ -60,8 +60,8 @@ var (
 	privKeyFile string
 )
 
-// Platformer store all the information needed by Terraform
-type Platformer struct {
+// Platform store all the information needed by Terraform
+type Platform struct {
 	Code         string
 	Vars         map[string]interface{}
 	Providers    map[string]terraform.ResourceProvider
@@ -77,7 +77,7 @@ func main() {
 
 	var state bytes.Buffer
 
-	p := &Platformer{
+	p := &Platform{
 		Code: Code,
 		Vars: map[string]interface{}{
 			"count": count,
@@ -111,7 +111,7 @@ func main() {
 		log.Fatalln(err)
 	}
 	defer os.RemoveAll(tfDir)
-	// Save the code into a single or multimple files
+	// Save the code into a single or multiple files
 	filename := filepath.Join(tfDir, "main.tf")
 	configFile, err := os.Create(filename)
 	if err != nil {
@@ -183,10 +183,10 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	// Retrive the state from the Terraform context
+	// Retrieve the state from the Terraform context
 	p.State = ctx.State()
 	if err := terraform.WriteState(p.State, &state); err != nil {
-		log.Fatalf("Failed to retrive the state. %s", err)
+		log.Fatalf("Failed to retrieve the state. %s", err)
 	}
 	// Save the state to the local file 'tf.state'
 	if err = ioutil.WriteFile(stateFile, state.Bytes(), 0644); err != nil {
