@@ -1,13 +1,23 @@
 SHELL			:= /bin/bash
 
+APP_NAME		?= terraform
+
 build:
-	go build -o tf .
+	go build -o $(APP_NAME) .
 
 clean:
-	$(RM) tf
+	$(RM) $(APP_NAME)
 
 clean-all: clean
 	$(RM) *.tfstate
+
+mod: mod-clean
+	go mod init github.com/johandry/terranova
+	go mod download
+
+mod-clean:
+	$(RM) go.mod go.sum
+	go clean -modcache
 
 describe-key-pairs:
 	aws ec2 describe-key-pairs --query 'KeyPairs[*].KeyName' --output table
@@ -36,3 +46,23 @@ test:
 		if [[ $${actual} == $${expected} ]]; then echo "OK"; else echo "FAIL"; result="FAIL"; fi; \
 	done; echo; \
 	echo "Test results: $${result}"
+
+docker-build:
+	docker build -t $(APP_NAME) .
+
+COUNT					?= 1
+AWS_ACCESS_KEY_ID 		?= $(shell cat ~/.aws/credentials | grep 'default]' -A 2 | grep aws_access_key_id | cut -d= -f2 | tr -d ' ')
+AWS_SECRET_ACCESS_KEY 	?= $(shell cat ~/.aws/credentials | grep 'default]' -A 2 | grep aws_secret_access_key | cut -d= -f2 | tr -d ' ')
+
+docker-run:
+	mkdir -p tmp
+	docker run \
+		-v $(HOME)/.ssh:/root/terraform/ssh \
+		-v $(PWD)/tmp:/root/terraform \
+		-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+		-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+		$(APP_NAME) \
+			--state /root/terraform/tf.state \
+			--pub /root/terraform/ssh/id_rsa.pub \
+			--priv /root/terraform/ssh/id_rsa \
+			--count $(COUNT)
