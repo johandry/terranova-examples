@@ -29,3 +29,13 @@ To terminate the instance set the `count` variable to `0`, build it (`go build`)
 id=$(grep '"id"' simple.tfstate | sed 's/.*: "\(.*\)",/\1/' | uniq)
 aws ec2 terminate-instances --instance-ids $id
 ```
+
+## Build
+
+To build it just execute `go build` and the output is the binary `simple` which when you execute it, you have an AWS EC2 instance running.
+
+To build it in a isolated environment such as a Docker container, use `docker` and the `Dockerfile` to build the image `simple` like this:
+
+```bash
+docker build -t simple .
+```
