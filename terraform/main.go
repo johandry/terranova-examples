@@ -18,7 +18,7 @@ import (
 
 // Code is the Terraform code to execute
 const Code = `
-variable "count" 	          { default = 2 }
+variable "count" 	        { default = 2 }
 variable "public_key_file"  { default = "~/.ssh/id_rsa.pub" }
 variable "private_key_file" { default = "~/.ssh/id_rsa" }
 locals {
@@ -50,14 +50,11 @@ resource "aws_key_pair" "keypair" {
 }
 `
 
-const (
-	stateFile = "tf.state"
-)
-
 var (
 	count       int
 	pubKeyFile  string
 	privKeyFile string
+	stateFile   string
 )
 
 // Platform store all the information needed by Terraform
@@ -73,6 +70,7 @@ func main() {
 	flag.IntVar(&count, "count", 2, "number of instances to create. Set to '0' to terminate them all.")
 	flag.StringVar(&pubKeyFile, "pub", "", "public key file to create the AWS Key Pair")
 	flag.StringVar(&privKeyFile, "priv", "", "private key file to connect to the new AWS EC2 instances")
+	flag.StringVar(&stateFile, "state", "tf.state", "terraform state file destination")
 	flag.Parse()
 
 	var state bytes.Buffer
