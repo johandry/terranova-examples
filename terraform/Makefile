@@ -12,8 +12,8 @@ clean-all: clean
 	$(RM) *.tfstate
 
 mod: mod-clean
-	go mod init github.com/johandry/terranova
-	go mod download
+	go mod init github.com/johandry/terranova-examples/terraform
+	go test ./...
 
 mod-clean:
 	$(RM) go.mod go.sum
@@ -66,3 +66,13 @@ docker-run:
 			--pub /root/terraform/ssh/id_rsa.pub \
 			--priv /root/terraform/ssh/id_rsa \
 			--count $(COUNT)
+
+docker-bash:
+	mkdir -p tmp
+	docker run -it \
+		-v $(HOME)/.ssh:/root/terraform/ssh \
+		-v $(PWD)/tmp:/root/terraform \
+		-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+		-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+		--entrypoint "/bin/sh" \
+		$(APP_NAME) 
