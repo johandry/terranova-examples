@@ -1,6 +1,7 @@
 SHELL			:= /bin/bash
 
-APP_NAME		?= terraform
+APP_NAME		?= tf
+IMG_NAME		?= tform
 
 build:
 	go build -o $(APP_NAME) .
@@ -13,7 +14,7 @@ clean-all: clean
 
 mod: mod-clean
 	go mod init github.com/johandry/terranova-examples/terraform
-	go test ./...
+	go mod tidy
 
 mod-clean:
 	$(RM) go.mod go.sum
@@ -50,9 +51,9 @@ test:
 docker-build:
 	docker build -t $(APP_NAME) .
 
-COUNT					?= 1
+COUNT									?= 1
 AWS_ACCESS_KEY_ID 		?= $(shell cat ~/.aws/credentials | grep 'default]' -A 2 | grep aws_access_key_id | cut -d= -f2 | tr -d ' ')
-AWS_SECRET_ACCESS_KEY 	?= $(shell cat ~/.aws/credentials | grep 'default]' -A 2 | grep aws_secret_access_key | cut -d= -f2 | tr -d ' ')
+AWS_SECRET_ACCESS_KEY ?= $(shell cat ~/.aws/credentials | grep 'default]' -A 2 | grep aws_secret_access_key | cut -d= -f2 | tr -d ' ')
 
 docker-run:
 	mkdir -p tmp
@@ -61,7 +62,7 @@ docker-run:
 		-v $(PWD)/tmp:/root/terraform \
 		-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 		-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
-		$(APP_NAME) \
+		$(IMG_NAME) \
 			--state /root/terraform/tf.state \
 			--pub /root/terraform/ssh/id_rsa.pub \
 			--priv /root/terraform/ssh/id_rsa \
@@ -75,4 +76,4 @@ docker-bash:
 		-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 		-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 		--entrypoint "/bin/sh" \
-		$(APP_NAME) 
+		$(IMG_NAME)
