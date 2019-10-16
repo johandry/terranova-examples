@@ -72,4 +72,5 @@ export AWS_SECRET_ACCESS_KEY=<your AWS secret access key>
 make docker-run COUNT=3
 make docker-run COUNT=0
 ```
+
 If something is wrong, login into the container with the binary executing `make docker-bash`.
