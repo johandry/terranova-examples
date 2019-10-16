@@ -18,7 +18,7 @@ func main() {
 
 	platform, err := terranova.NewPlatform(code).
 		AddProvider("aws", aws.Provider()).
-		Var("count", count).
+		Var("c", count).
 		Var("key_name", keyName).
 		ReadStateFromFile(stateFilename)
 
@@ -42,7 +42,7 @@ func main() {
 
 func init() {
 	code = `
-  variable "count"    { default = 2 }
+  variable "c"    { default = 2 }
   variable "key_name" {}
   provider "aws" {
     region        = "us-west-2"
@@ -50,7 +50,7 @@ func init() {
   resource "aws_instance" "server" {
     instance_type = "t2.micro"
     ami           = "ami-6e1a0117"
-    count         = "${var.count}"
+    count         = "${var.c}"
     key_name      = "${var.key_name}"
   }
 `
