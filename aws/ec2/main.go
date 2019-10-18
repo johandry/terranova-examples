@@ -29,7 +29,7 @@ func main() {
 	platform, err := terranova.NewPlatform(code).
 		AddProvider("aws", aws.Provider()).
 		AddProvisioner("file", file.Provisioner()).
-		Var("count", count).
+		Var("srv_count", count).
 		ReadStateFromFile(stateFilename)
 
 	if len(pubKeyFile) != 0 {
@@ -64,7 +64,7 @@ func init() {
 	flag.StringVar(&privKeyFile, "priv", "", "private key file to connect to the new AWS EC2 instances")
 
 	code = `
-  variable "count" 	          { default = 2 }
+  variable "srv_count" 	      { default = 2 }
   variable "public_key_file"  { default = "~/.ssh/id_rsa.pub" }
   variable "private_key_file" { default = "~/.ssh/id_rsa" }
   locals {
@@ -77,7 +77,7 @@ func init() {
   resource "aws_instance" "server" {
     instance_type = "t2.micro"
     ami           = "ami-6e1a0117"
-    count         = "${var.count}"
+    count         = "${var.srv_count}"
     key_name      = "server_key"
 
     provisioner "file" {
@@ -86,7 +86,8 @@ func init() {
 
       connection {
         user        = "ubuntu"
-        private_key = "${local.private_key}"
+				private_key = "${local.private_key}"
+				host 				= "${self.public_ip}"
       }
     }
   }
