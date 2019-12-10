@@ -9,4 +9,4 @@ require (
 )
 
 // use this replace when using or testing the local version of terranova
-replace github.com/johandry/terranova => ../../../terranova
+// replace github.com/johandry/terranova => ../../../terranova

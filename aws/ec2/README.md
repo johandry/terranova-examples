@@ -58,11 +58,11 @@ aws ec2 delete-key-pair --key-name server_key
 
 It's safe to delete the file `aws-ec2-ubuntu.tfstate` when the EC2 instances are terminated.
 
-## How it works?
+## How it works
 
 The program starts with the setup and parse of the flags, then it sets the global variable `code` with the Terraform code to execute. The Terraform code creates a key pair used to login into the created instances, then create the amount of requested instances and finally creates the file `/tmp/file.log` in every instance with the AMI Id used.
 
-After the parse of the flags (line `flag.Parse()`), a log instance is created. This instance is necessary if we are going to use the log middleware. 
+After the parse of the flags (line `flag.Parse()`), a log instance is created. This instance is necessary if we are going to use the log middleware.
 
 The log middleware hijacks the standard log instance to intercept the Terraform output, parse it and send it back to the custom logger (`myLog`). This custom logger uses the default Terranova logger sending the output to StdErr or discard it if the flag `--quiet` was used. The custom logger also uses the log level Info (prints Info, Warns and Errors) or the log level Debug (prints debug entries + the same as Info) if the flag `--debug` is set.
 
@@ -75,12 +75,12 @@ defer logMiddleware.Close()
 One of the most important code segment is the one where the Platform is created:
 
 ```go
-	platform, err := terranova.NewPlatform(code).
-		AddMiddleware(logMiddleware).
-		AddProvider("aws", aws.Provider()).
-		AddProvisioner("file", file.Provisioner()).
-		Var("srv_count", count).
-		ReadStateFromFile(stateFilename)
+  platform, err := terranova.NewPlatform(code).
+    AddMiddleware(logMiddleware).
+    AddProvider("aws", aws.Provider()).
+    AddProvisioner("file", file.Provisioner()).
+    Var("srv_count", count).
+    ReadStateFromFile(stateFilename)
 ```
 
 It starts passing the Terraform code and the next line sets the logger middleware. The following lines adds the AWS provider to the platform, because it's the provider used in the Terraform code. The same with the File provisioner, because it's used in the Terraform code (`provisioner "file"`) and send the value for the variable `srv_count` which is also used in the code (`variable "srv_count"`).
