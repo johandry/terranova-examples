@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/johandry/terranova"
+	"github.com/johandry/terranova/logger"
 	"github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
@@ -13,10 +14,15 @@ var code string
 const stateFilename = "simple.tfstate"
 
 func main() {
-	count := 1
+	count := 0
 	keyName := "demo"
 
+	log := log.New(os.Stderr, "", log.LstdFlags)
+	logMiddleware := logger.NewMiddleware()
+	defer logMiddleware.Close()
+
 	platform, err := terranova.NewPlatform(code).
+		AddMiddleware(logMiddleware).
 		AddProvider("aws", aws.Provider()).
 		Var("c", count).
 		Var("key_name", keyName).
