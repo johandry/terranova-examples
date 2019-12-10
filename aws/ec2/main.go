@@ -51,6 +51,7 @@ func main() {
 	}
 	myLog := logger.NewLog(output, "EC2", logLevel)
 	logMiddleware := logger.NewMiddleware(myLog)
+	defer logMiddleware.Close()
 
 	platform, err := terranova.NewPlatform(code).
 		AddMiddleware(logMiddleware).
@@ -58,8 +59,6 @@ func main() {
 		AddProvisioner("file", file.Provisioner()).
 		Var("srv_count", count).
 		ReadStateFromFile(stateFilename)
-
-	defer logMiddleware.Close()
 
 	if len(pubKeyFile) != 0 {
 		platform.Var("public_key_file", pubKeyFile)

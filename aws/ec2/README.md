@@ -62,7 +62,15 @@ It's safe to delete the file `aws-ec2-ubuntu.tfstate` when the EC2 instances are
 
 The program starts with the setup and parse of the flags, then it sets the global variable `code` with the Terraform code to execute. The Terraform code creates a key pair used to login into the created instances, then create the amount of requested instances and finally creates the file `/tmp/file.log` in every instance with the AMI Id used.
 
-After the parse of the flags (line `flag.Parse()`), a log instance is created. This instance is necessary if we are going to use the log middleware. The log middleware hijacks the standard log instance to intercept the Terraform output, parse it and send it back to the custom logger (`myLog`). This custom logger uses the default Terranova logger sending the output to StdErr or discard it if the flag `--quiet` was used. The custom logger also uses the log level Info (prints Info, Warns and Errors) or the log level Debug (prints debug entries + the same as Info) if the flag `--debug` is set.
+After the parse of the flags (line `flag.Parse()`), a log instance is created. This instance is necessary if we are going to use the log middleware. 
+
+The log middleware hijacks the standard log instance to intercept the Terraform output, parse it and send it back to the custom logger (`myLog`). This custom logger uses the default Terranova logger sending the output to StdErr or discard it if the flag `--quiet` was used. The custom logger also uses the log level Info (prints Info, Warns and Errors) or the log level Debug (prints debug entries + the same as Info) if the flag `--debug` is set.
+
+Starting this point, every log entry using the standard log is hijacked and parsed by the middleware. This hijack stops when we close the middleware:
+
+```go
+defer logMiddleware.Close()
+```
 
 One of the most important code segment is the one where the Platform is created:
 
@@ -75,13 +83,7 @@ One of the most important code segment is the one where the Platform is created:
 		ReadStateFromFile(stateFilename)
 ```
 
-It starts passing the Terraform code. Then we set the logger middleware and starting this point, every log entry using the standard log is hijacked and parsed by the middleware. This hijack stops when we close the middleware:
-
-```go
-defer logMiddleware.Close()
-```
-
-The following lines adds the AWS provider to the platform, because it's the provider used in the Terraform code. The same with the File provisioner, because it's used in the Terraform code (`provisioner "file"`) and send the value for the variable `srv_count` which is also used in the code (`variable "srv_count"`).
+It starts passing the Terraform code and the next line sets the logger middleware. The following lines adds the AWS provider to the platform, because it's the provider used in the Terraform code. The same with the File provisioner, because it's used in the Terraform code (`provisioner "file"`) and send the value for the variable `srv_count` which is also used in the code (`variable "srv_count"`).
 
 The last line is very important, here we load the platform state located in the file `aws-ec2-ubuntu.tfstate` (if exists). If there is on state (file) the requested amount of instances will be created, if there is a state then the instances will be scaled (up or down) or terminated (if the amount is `0`).
 
