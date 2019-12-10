@@ -42,6 +42,13 @@ To terminate the instances, use the command:
 
 Verify the results with the AWS CLI command above.
 
+The binary accept the following parameters:
+
+* `--count` the number of instances to create or scale up/down. If it's `0` it will terminate all the existing instances.
+* `--pub` and `--priv` are the public or private key files. If they are passed as parameters they won't be created.
+* `--debug` prints the Terraform debug logs. If not used (default) the binary only prints info, warning and error log level entries from Terraform.
+* `--quiet` do not print any Terraform output, it will print only the output from the binary.
+
 *IMPORTANT*: Do not delete the file `aws-ec2-ubuntu.tfstate` if you have EC2 instances. If you lost it, identify the instance IDs to terminate with the AWS CLI command previously used to verify results, then terminate your existing EC2 instances and Key Pair with the following AWS CLI command:
 
 ```bash
@@ -50,3 +57,36 @@ aws ec2 delete-key-pair --key-name server_key
 ```
 
 It's safe to delete the file `aws-ec2-ubuntu.tfstate` when the EC2 instances are terminated.
+
+## How it works?
+
+The program starts with the setup and parse of the flags, then it sets the global variable `code` with the Terraform code to execute. The Terraform code creates a key pair used to login into the created instances, then create the amount of requested instances and finally creates the file `/tmp/file.log` in every instance with the AMI Id used.
+
+After the parse of the flags (line `flag.Parse()`), a log instance is created. This instance is necessary if we are going to use the log middleware. The log middleware hijacks the standard log instance to intercept the Terraform output, parse it and send it back to the custom logger (`myLog`). This custom logger uses the default Terranova logger sending the output to StdErr or discard it if the flag `--quiet` was used. The custom logger also uses the log level Info (prints Info, Warns and Errors) or the log level Debug (prints debug entries + the same as Info) if the flag `--debug` is set.
+
+One of the most important code segment is the one where the Platform is created:
+
+```go
+	platform, err := terranova.NewPlatform(code).
+		AddMiddleware(logMiddleware).
+		AddProvider("aws", aws.Provider()).
+		AddProvisioner("file", file.Provisioner()).
+		Var("srv_count", count).
+		ReadStateFromFile(stateFilename)
+```
+
+It starts passing the Terraform code. Then we set the logger middleware and starting this point, every log entry using the standard log is hijacked and parsed by the middleware. This hijack stops when we close the middleware:
+
+```go
+defer logMiddleware.Close()
+```
+
+The following lines adds the AWS provider to the platform, because it's the provider used in the Terraform code. The same with the File provisioner, because it's used in the Terraform code (`provisioner "file"`) and send the value for the variable `srv_count` which is also used in the code (`variable "srv_count"`).
+
+The last line is very important, here we load the platform state located in the file `aws-ec2-ubuntu.tfstate` (if exists). If there is on state (file) the requested amount of instances will be created, if there is a state then the instances will be scaled (up or down) or terminated (if the amount is `0`).
+
+If a variable have a default value in the Terraform code, it's optional to set its value using the `Var()` method. That's what happens with the variables `public_key_file` and `private_key_file`.
+
+At this point everything is set to apply the Terraform code, this is done with the method `Apply()` sending a boolean value to provision (`false`) or terminate (`true`).
+
+Once the code is applied, we finalize with saving the current state into the state file, using the method `WriteStateToFile()`.

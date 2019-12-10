@@ -2,11 +2,14 @@ package main
 
 import (
 	"flag"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 
 	"github.com/hashicorp/terraform/builtin/provisioners/file"
 	"github.com/johandry/terranova"
+	"github.com/johandry/terranova/logger"
 	"github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
@@ -15,6 +18,8 @@ var (
 	count       int
 	pubKeyFile  string
 	privKeyFile string
+	debug       bool
+	quiet       bool
 )
 
 const stateFilename = "aws-ec2-ubuntu.tfstate"
@@ -22,15 +27,39 @@ const stateFilename = "aws-ec2-ubuntu.tfstate"
 func main() {
 	flag.Parse()
 
+	// the standard log cannot be used because it's hijaked by the logger
+	// Middleware. To use the logs, a new instance is required.
+	log := log.New(os.Stderr, "", log.LstdFlags)
+
 	if count < 0 {
 		log.Fatalf("count cannot be negative. It has to be '0' to terminate all the creted instances or the desired number of instances")
 	}
 
+	if debug && quiet {
+		log.Fatal("debug mode and quiet mode cannot be set at the same time")
+	}
+
+	log.Printf("Starting to (de)provision on AWS")
+
+	logLevel := logger.LogLevelInfo
+	if debug {
+		logLevel = logger.LogLevelDebug
+	}
+	var output io.Writer = os.Stderr
+	if quiet {
+		output = ioutil.Discard
+	}
+	myLog := logger.NewLog(output, "EC2", logLevel)
+	logMiddleware := logger.NewMiddleware(myLog)
+
 	platform, err := terranova.NewPlatform(code).
+		AddMiddleware(logMiddleware).
 		AddProvider("aws", aws.Provider()).
 		AddProvisioner("file", file.Provisioner()).
 		Var("srv_count", count).
 		ReadStateFromFile(stateFilename)
+
+	defer logMiddleware.Close()
 
 	if len(pubKeyFile) != 0 {
 		platform.Var("public_key_file", pubKeyFile)
@@ -62,6 +91,8 @@ func init() {
 	flag.IntVar(&count, "count", 2, "number of instances to create. Set to '0' to terminate them all.")
 	flag.StringVar(&pubKeyFile, "pub", "", "public key file to create the AWS Key Pair")
 	flag.StringVar(&privKeyFile, "priv", "", "private key file to connect to the new AWS EC2 instances")
+	flag.BoolVar(&debug, "debug", false, "debug mode, prints also debug output from terraform")
+	flag.BoolVar(&quiet, "quiet", false, "quiet/silence mode, do not print any terraform output")
 
 	code = `
   variable "srv_count" 	      { default = 2 }
