@@ -38,7 +38,7 @@ aws ec2 terminate-instances --instance-ids $id
 
 This program is similar to the AWS/Simple example, the only difference is how to use the custom logs to print (or not) the intercepted logs from Terraform.
 
-The value of the variable `logType` will define the type of custom log to use. The `switch` statement below will create the Terranova Log Middleware to intercept, parse and print the Terraform logs but using the created custom logger. 
+The value of the variable `logType` will define the type of custom log to use. The `switch` statement below will create the Terranova Log Middleware to intercept, parse and print the Terraform logs but using the created custom logger.
 
 The logger has to implement the Terranova interface `Logger` which defines certain number of methods such as `Infof`, `Warnf` and `Errors` among others, to print the log message in the desired format.
 
@@ -50,7 +50,7 @@ Each example custom logger is in a file located in the local package `log`, the 
 
 This is the default logger provided by Terranova. It just print every log entry in the format:
 
-```
+```text
 LEVEL [date] message
 ```
 
@@ -86,17 +86,17 @@ Here are 2 examples: `jlog-viper` configures the logger just from the code using
 
 Both examples use colors (configurable) to print the log entries and have the format:
 
-```
+```text
 [date] LEVEL Prefix: message
 ```
 
 Where LEVEL is one of the following texts: `DEBUG`, `INFO`, `WARN` and `ERROR` . The date and message are the same from Terraform. The Prefix could be defined but by default it's `Terranova`.
 
-The package `github.com/johandry/log` uses also `sirupsen/logrus` to format and print the log entries. 
+The package `github.com/johandry/log` uses also `sirupsen/logrus` to format and print the log entries.
 
 ### `sirupsen/logrus` in Text and JSON format
 
-The `sirupsen/logrus` package is a widely used package for logging in Go. You can use it to print the logs in different formats, using fields, use Hooks and many other features. 
+The `sirupsen/logrus` package is a widely used package for logging in Go. You can use it to print the logs in different formats, using fields, use Hooks and many other features.
 
 Here are 2 examples: `logrus-json` to print the log entries in JSON and `logrus` to print the log entries in text. Both examples print the fields `platform` and `count`, uses colors and begins with the log level in uppercase.
 
@@ -175,5 +175,3 @@ make clean-key
 make terminate     # Only if there are existing instances
 rm simple simple.tfstate
 ```
-
-## 
