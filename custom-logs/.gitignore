@@ -1,5 +1,6 @@
 *.pem
 simple
+custom-logs
 *.tfstate
 
 pkg/
