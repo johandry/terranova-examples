@@ -310,8 +310,8 @@ github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af h1:pmfjZENx5i
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
 github.com/johandry/log v0.0.0-20190918193429-2b13006dd125 h1:S3BzwBioQi6m3xCe1prxSMrQB/RHBh+2nnhXedJdAsM=
 github.com/johandry/log v0.0.0-20190918193429-2b13006dd125/go.mod h1:BgBGuPtko9fobcITWXbETauUZ9bAiOInTkLG/fufHXw=
-github.com/johandry/terranova-examples v0.0.0-20191018043822-d16039085ce0 h1:6zAB6yDKumDFvo88aoxwWOu26sgGNl0a0b6BCg+WwgA=
-github.com/johandry/terranova-examples/aws/simple v0.0.0-20191018043822-d16039085ce0 h1:aH5tb1BmxthmDexJ5tT0ILevmYgke5aDSxHCBZEr8c0=
+github.com/johandry/terranova v0.0.3 h1:HAwO5CdeX18o4h59ZnmhYQhPMA0sUUI2a6LOIL0pvtM=
+github.com/johandry/terranova v0.0.3/go.mod h1:TmyeWOGVyP5FA6WQa8OvvkWJd6bTcOJuhFTPQdy3Or0=
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
 github.com/joyent/triton-go v0.0.0-20180313100802-d8f9c0314926/go.mod h1:U+RSyWxWd04xTqnuOQxnai7XGS2PrPY2cfGoDKtMHjA=
 github.com/json-iterator/go v1.1.5 h1:gL2yXlmiIo4+t+y32d4WGwOjKGYcGOuyrg46vadswDE=
