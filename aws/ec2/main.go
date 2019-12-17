@@ -54,7 +54,7 @@ func main() {
 	defer logMiddleware.Close()
 
 	platform, err := terranova.NewPlatform(code).
-		AddMiddleware(logMiddleware).
+		SetMiddleware(logMiddleware).
 		AddProvider("aws", aws.Provider()).
 		AddProvisioner("file", file.Provisioner()).
 		Var("srv_count", count).

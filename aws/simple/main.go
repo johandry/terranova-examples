@@ -22,7 +22,7 @@ func main() {
 	defer logMiddleware.Close()
 
 	platform, err := terranova.NewPlatform(code).
-		AddMiddleware(logMiddleware).
+		SetMiddleware(logMiddleware).
 		AddProvider("aws", aws.Provider()).
 		Var("c", count).
 		Var("key_name", keyName).

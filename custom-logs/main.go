@@ -48,7 +48,7 @@ func main() {
 	}
 
 	if logMiddleware != nil {
-		platform.AddMiddleware(logMiddleware)
+		platform.SetMiddleware(logMiddleware)
 	}
 
 	log := log.New(os.Stderr, "SIMPLE: ", log.LstdFlags)

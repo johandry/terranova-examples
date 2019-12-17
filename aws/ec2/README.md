@@ -76,7 +76,7 @@ One of the most important code segment is the one where the Platform is created:
 
 ```go
   platform, err := terranova.NewPlatform(code).
-    AddMiddleware(logMiddleware).
+    SetMiddleware(logMiddleware).
     AddProvider("aws", aws.Provider()).
     AddProvisioner("file", file.Provisioner()).
     Var("srv_count", count).
