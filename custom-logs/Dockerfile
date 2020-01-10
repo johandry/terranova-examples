@@ -3,7 +3,7 @@ FROM golang AS base
 
 ENV GO111MODULE=on
 
-WORKDIR /workspace/simple
+WORKDIR /workspace/terractl
 
 COPY ./pkg ./pkg
 COPY go.mod .
@@ -22,16 +22,16 @@ ENTRYPOINT [ "bash" ]
 # Image to build the application
 FROM base AS builder
 
-WORKDIR /workspace/simple
+WORKDIR /workspace/terractl
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /simple 
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /terractl 
 
 # -----------------------------------------------
 # Application image used for development and test
 # Use it with `build --target=app-dev`
 FROM alpine:3.9 AS app-dev
 
-COPY --from=builder /simple /app/
+COPY --from=builder /terractl /app/
 
 ENTRYPOINT [ "ash" ]
 
@@ -39,6 +39,6 @@ ENTRYPOINT [ "ash" ]
 # Application image, use it with `build --target=app`
 FROM alpine:3.9 AS app
 
-COPY --from=builder /simple /app/
+COPY --from=builder /terractl /app/
 
-ENTRYPOINT [ "/app/simple" ]
+ENTRYPOINT [ "/app/terractl" ]

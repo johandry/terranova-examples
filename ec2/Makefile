@@ -9,6 +9,14 @@ clean:
 clean-all: clean
 	$(RM) *.tfstate
 
+setup:
+	sed -i .bkp 's|^// replace github.com/johandry/terranova|replace github.com/johandry/terranova|' go.mod
+	rm go.mod.bkp
+
+clean-setup:
+	sed -i .bkp 's|^replace github.com/johandry/terranova|// replace github.com/johandry/terranova|' go.mod
+	rm -f go.mod.bkp
+
 describe-key-pairs:
 	aws ec2 describe-key-pairs --query 'KeyPairs[*].KeyName' --output table
 

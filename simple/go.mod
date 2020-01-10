@@ -8,5 +8,6 @@ require (
 )
 
 // use this replace when using or testing the local version of terranova
-// local: replace github.com/johandry/terranova => ../../../terranova
+// local: replace github.com/johandry/terranova => ../../terranova
+
 // docker: replace github.com/johandry/terranova => ./pkg/terranova

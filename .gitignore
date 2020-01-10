@@ -1,5 +1,4 @@
 *.pem
-simple
+terractl
 *.tfstate
-
 pkg/

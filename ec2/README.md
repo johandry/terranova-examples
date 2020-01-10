@@ -1,6 +1,6 @@
 # Terranova Example: AWS EC2 instances
 
-This example is to create, scale or terminate AWS EC2 instances using the Terranova package. The code is explained in the blog post [Terranova: Using Terraform from Go](http://blog.johandry.com/post/terranova-terraform-from-go/).
+This example is to create, scale or terminate AWS EC2 instances using the Terranova package. It's similar to the Simple example but the CLI is user friendly. The code is explained in the blog post [Terranova: Using Terraform from Go](http://blog.johandry.com/post/terranova-terraform-from-go/).
 
 To Build the example execute:
 
@@ -66,7 +66,7 @@ After the parse of the flags (line `flag.Parse()`), a log instance is created. T
 
 The log middleware hijacks the standard log instance to intercept the Terraform output, parse it and send it back to the custom logger (`myLog`). This custom logger uses the default Terranova logger sending the output to StdErr or discard it if the flag `--quiet` was used. The custom logger also uses the log level Info (prints Info, Warns and Errors) or the log level Debug (prints debug entries + the same as Info) if the flag `--debug` is set.
 
-Starting this point, every log entry using the standard log is hijacked and parsed by the middleware. This hijack stops when we close the middleware:
+The hijack of the Terraform logs stops when we close the middleware:
 
 ```go
 defer logMiddleware.Close()
@@ -80,15 +80,13 @@ One of the most important code segment is the one where the Platform is created:
     AddProvider("aws", aws.Provider()).
     AddProvisioner("file", file.Provisioner()).
     Var("srv_count", count).
-    ReadStateFromFile(stateFilename)
+    PersistStateToFile(stateFilename)
 ```
 
 It starts passing the Terraform code and the next line sets the logger middleware. The following lines adds the AWS provider to the platform, because it's the provider used in the Terraform code. The same with the File provisioner, because it's used in the Terraform code (`provisioner "file"`) and send the value for the variable `srv_count` which is also used in the code (`variable "srv_count"`).
 
-The last line is very important, here we load the platform state located in the file `aws-ec2-ubuntu.tfstate` (if exists). If there is on state (file) the requested amount of instances will be created, if there is a state then the instances will be scaled (up or down) or terminated (if the amount is `0`).
+The last line is very important, here we load the platform state located in the file `aws-ec2-ubuntu.tfstate` (if exists). If there is on state (file) the requested amount of instances will be created, if there is a state then the instances will be scaled (up or down) or terminated (if the amount is `0`). The function `PersistStateToFile()` ensures the state file is always updated when a change is done.
 
 If a variable have a default value in the Terraform code, it's optional to set its value using the `Var()` method. That's what happens with the variables `public_key_file` and `private_key_file`.
 
 At this point everything is set to apply the Terraform code, this is done with the method `Apply()` sending a boolean value to provision (`false`) or terminate (`true`).
-
-Once the code is applied, we finalize with saving the current state into the state file, using the method `WriteStateToFile()`.

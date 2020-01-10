@@ -58,7 +58,7 @@ func main() {
 		AddProvider("aws", aws.Provider()).
 		AddProvisioner("file", file.Provisioner()).
 		Var("srv_count", count).
-		ReadStateFromFile(stateFilename)
+		PersistStateToFile(stateFilename)
 
 	if len(pubKeyFile) != 0 {
 		platform.Var("public_key_file", pubKeyFile)
@@ -68,19 +68,11 @@ func main() {
 	}
 
 	if err != nil {
-		if os.IsNotExist(err) {
-			log.Printf("[DEBUG] state file %s does not exists", stateFilename)
-		} else {
-			log.Fatalf("Fail to load the initial state of the platform from file %s. %s", stateFilename, err)
-		}
+		log.Fatalf("Fail to create the platform using state file %s. %s", stateFilename, err)
 	}
 
 	if err := platform.Apply((count == 0)); err != nil {
 		log.Fatalf("Fail to apply the changes to the platform. %s", err)
-	}
-
-	if _, err := platform.WriteStateToFile(stateFilename); err != nil {
-		log.Fatalf("Fail to save the final state of the platform to file %s. %s", stateFilename, err)
 	}
 
 	log.Printf("Check your EC2 instances with the AWS CLI command: `aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId, PublicIpAddress, State.Name]' --output table`")

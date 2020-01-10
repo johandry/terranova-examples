@@ -14,5 +14,4 @@ require (
 replace github.com/terraform-providers/terraform-provider-tls => github.com/terraform-providers/terraform-provider-tls v1.2.1-0.20190816230231-0790c4b40281
 
 // use this replace when using or testing the local version of terranova
-// local: replace github.com/johandry/terranova => ../../terranova
-// docker: replace github.com/johandry/terranova => ./pkg/terranova
+// replace github.com/johandry/terranova => ../../terranova

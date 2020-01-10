@@ -26,23 +26,15 @@ func main() {
 		AddProvider("aws", aws.Provider()).
 		Var("c", count).
 		Var("key_name", keyName).
-		ReadStateFromFile(stateFilename)
+		PersistStateToFile(stateFilename)
 
 	if err != nil {
-		if os.IsNotExist(err) {
-			log.Printf("[DEBUG] state file %s does not exists", stateFilename)
-		} else {
-			log.Fatalf("Fail to load the initial state of the platform from file %s. %s", stateFilename, err)
-		}
+		log.Fatalf("Fail to create the platform using state file %s. %s", stateFilename, err)
 	}
 
 	terminate := (count == 0)
 	if err := platform.Apply(terminate); err != nil {
 		log.Fatalf("Fail to apply the changes to the platform. %s", err)
-	}
-
-	if _, err := platform.WriteStateToFile(stateFilename); err != nil {
-		log.Fatalf("Fail to save the final state of the platform to file %s. %s", stateFilename, err)
 	}
 }
 

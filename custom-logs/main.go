@@ -12,12 +12,12 @@ import (
 
 var code string
 
-const stateFilename = "simple.tfstate"
+const stateFilename = "terractl.tfstate"
 
 func main() {
 	var logMiddleware *logger.Middleware
 
-	count := 1
+	count := 0
 	logType := "custom" // "default", "terraform", "discard", "custom", "jlog-viper", "jlog-config", "logrus", "logrus-json"
 
 	keyName := "demo"
@@ -51,7 +51,7 @@ func main() {
 		platform.SetMiddleware(logMiddleware)
 	}
 
-	log := log.New(os.Stderr, "SIMPLE: ", log.LstdFlags)
+	log := log.New(os.Stderr, "TERRACTL: ", log.LstdFlags)
 
 	if err != nil {
 		if os.IsNotExist(err) {
