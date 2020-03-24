@@ -1,4 +1,4 @@
-module github.com/johandry/terranova-examples/custom-logs
+module github.com/johandry/terranova-examples/05_custom-logs/terractl
 
 go 1.13
 

@@ -1,4 +1,4 @@
-module github.com/johandry/terranova-examples/aws/ec2
+module github.com/johandry/terranova-examples/02_ec2/ec2
 
 go 1.13
 

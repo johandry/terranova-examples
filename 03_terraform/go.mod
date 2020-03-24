@@ -1,4 +1,4 @@
-module github.com/johandry/terranova-examples/terraform
+module github.com/johandry/terranova-examples/03_terraform/terractl
 
 go 1.12
 

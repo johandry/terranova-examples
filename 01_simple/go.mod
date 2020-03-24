@@ -1,4 +1,4 @@
-module github.com/johandry/terranova-examples/aws/simple
+module github.com/johandry/terranova-examples/01_simple/simple
 
 go 1.13
 
