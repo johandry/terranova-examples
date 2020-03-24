@@ -93,7 +93,8 @@ func main() {
 	}
 
 	publicIP, _ := platform.OutputValueAsString("public_ip")
-	log.Printf("The web server is ready at: http://%s:%s", publicIP, port)
+	log.Printf("Check the status and logs at: http://%s:%s", publicIP, "8081")
+	log.Printf("The web server will be ready at: http://%s:%s", publicIP, port)
 
 	if sshAccess {
 		pubKeyFile, _ := platform.OutputValueAsString("public_key_file")
@@ -115,6 +116,7 @@ func init() {
 
 	tfCode = `
 variable "port" { default = 8080 }
+variable "logport" { default = 8081 }
 variable "public_key_file"  { default = "~/.ssh/id_rsa.pub" }
 variable "private_key_file" { default = "~/.ssh/id_rsa" }
 locals {
@@ -123,21 +125,45 @@ locals {
 	userdata   		= <<-USERDATA
 #! /bin/bash
 
+# Start the status reporter
+html_status() { 
+	echo '<li><span style="color:blue">[INFO]</span> '$1'</li>' >> status.txt; 
+	echo "<html><head><title>Server Status</title>" > index.html;
+	[[ $2 != "END" ]] && echo '<meta http-equiv="refresh" content="10"/>' >> index.html; 
+	echo '</head><body><h2>Status:</h2><ul style="list-style-type:none">' >> index.html; 
+	cat status.txt >>index.html;
+	echo '</ul><h2>Logs:</h2><textarea rows="50" cols="100">' >>index.html
+	cat /var/log/cloud-init-output.log >>index.html
+	echo '</textarea>' >>index.html
+	echo "</body></html>" >>index.html; 
+}
+nohup busybox httpd -f -p ${var.logport} &
+echo $! > httpd.pid
+
 # Install Docker
+html_status "updating the packages..."
 sudo apt-get update
+html_status "done"
+html_status "installing curl, CA certificates and other packages..."
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+html_status "done"
+html_status "installing docker..."
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-sudo usermod -aG docker $${USER}
+sudo usermod -aG docker $USER
+html_status "done"
 
 # Install Docker Compose
+html_status "installing docker compose..."
 sudo curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+html_status "done"
 
 # Create the Docker Compose file
+html_status "creating docker compose file..."
 cat <<DOCKERFILE >docker-compose.yaml
 version: '3'
 services:
@@ -146,15 +172,26 @@ services:
     links:
       - mongo
     ports:
-      - 8080:8080
+      - ${var.port}:8080
       - 5222:5222
 
   mongo:
     image: mongo:latest
 DOCKERFILE
+html_status "done"
+
+html_status "starting docker compose with Let'sChat and MongoDB..."
+# kill -9 $(cat httpd.pid)
+# rm -f httpd.pid
 
 # Start Docker Compose
 sudo docker-compose up -d
+html_status "done"
+
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/public-hostname)
+
+html_status 'Go to: <a href="http://'$IP':${var.port}">http://'$IP':${var.port}</a>' "END"
 USERDATA
 }
 
@@ -193,6 +230,14 @@ resource "aws_security_group" "webserver_ingress" {
 		description = "Open port to web application hosted"
     from_port   = var.port
     to_port     = var.port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+	}
+
+  ingress {
+		description = "Open port to web application hosted"
+    from_port   = var.logport
+    to_port     = var.logport
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 	}
