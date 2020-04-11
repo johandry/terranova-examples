@@ -40,6 +40,6 @@ func main() {
 	log.Printf("The web server will be ready at: http://%s:%s", publicIP, opt.Port)
 
 	if opt.SSHAccess {
-		log.Printf("Connect to the server executing: ssh -i %s %s@%s", opt.PubKeyFile, "ubuntu", publicIP)
+		log.Printf("Connect to the server executing: ssh -i %s %s@%s", opt.PrivKeyFile, "ubuntu", publicIP)
 	}
 }
