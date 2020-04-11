@@ -42,7 +42,7 @@ func cliParse() *options {
 	flag.StringVar(&opt.StatusPort, "status-port", opt.StatusPort, "port to expose the server status")
 	flag.StringVar(&opt.PubKeyFile, "pub", opt.PubKeyFile, "public key file to create the AWS Key Pair")
 	flag.StringVar(&opt.PrivKeyFile, "priv", opt.PrivKeyFile, "private key file to connect to the new AWS EC2 instances")
-	flag.BoolVar(&opt.SSHAccess, "shh-access", opt.SSHAccess, "enable SSH access to the hosts")
+	flag.BoolVar(&opt.SSHAccess, "ssh-access", opt.SSHAccess, "enable SSH access to the hosts")
 	flag.StringVar(&opt.SSHFrom, "ssh-from", opt.SSHFrom, "Allow connection from this IP address")
 
 	flag.Parse()
