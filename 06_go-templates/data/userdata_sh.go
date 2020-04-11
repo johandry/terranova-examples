@@ -65,7 +65,7 @@ html_status "done"
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/public-hostname)
 
-html_status 'Go to: <a href="http://'$IP':${var.port}">http://'$IP':${var.port}</a>' "END"
+html_status 'Go to: <a href="http://'$IP':{{ .LetsChatPort }}">http://'$IP':{{ .LetsChatPort }}</a>' "END"
 {{ if .Status }}
 # TODO: Make this a task that will run 10 min later
 # kill -9 $(cat httpd.pid)
