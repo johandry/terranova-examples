@@ -3,8 +3,7 @@ module github.com/johandry/terranova-examples/06_go-templates/letschat
 go 1.14
 
 require (
-	github.com/hashicorp/terraform v0.12.20 // indirect
-	github.com/johandry/terranova v0.0.3
+	github.com/johandry/terranova v0.0.4
 	github.com/terraform-providers/terraform-provider-aws v1.60.1-0.20191003145700-f8707a46c6ec
 )
 
