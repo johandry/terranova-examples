@@ -3,14 +3,14 @@ package data
 // UserdataTmplData is the template data structure
 type UserdataTmplData struct {
 	LetsChatPort     string
+	Status           bool
 	StatusPort       string
 	DockerComposeB64 string
 }
 
 // UserdataTmpl is the bash code in form of Go template to set as USERDATA and
 // execute by Cloud Init in the new instance after rendered.
-const UserdataTmpl = `
-#! /bin/bash
+const UserdataTmpl = `#!/bin/bash
 
 # Start the status reporter
 html_status() { 
@@ -24,8 +24,10 @@ html_status() {
 	echo '</textarea>' >>index.html
 	echo "</body></html>" >>index.html; 
 }
+{{ if .Status }}
 nohup busybox httpd -f -p {{ .StatusPort }} &
 echo $! > httpd.pid
+{{- end }}
 
 # Install Docker
 html_status "updating the packages..."
@@ -51,12 +53,10 @@ html_status "done"
 
 # Create the Docker Compose file
 html_status "creating docker compose file..."
-echo {{ .DockerComposeB64 }} | base64 --decode > docker-compose.yaml
+echo '{{ .DockerComposeB64 }}' | base64 --decode > docker-compose.yaml
 html_status "done"
 
 html_status "starting docker compose with Let'sChat and MongoDB..."
-# kill -9 $(cat httpd.pid)
-# rm -f httpd.pid
 
 # Start Docker Compose
 sudo docker-compose up -d
@@ -66,4 +66,9 @@ TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-meta
 IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/public-hostname)
 
 html_status 'Go to: <a href="http://'$IP':${var.port}">http://'$IP':${var.port}</a>' "END"
+{{ if .Status }}
+# TODO: Make this a task that will run 10 min later
+# kill -9 $(cat httpd.pid)
+# rm -f httpd.pid
+{{- end }}
 `

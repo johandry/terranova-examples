@@ -19,6 +19,7 @@ func tfCode(opt *options) (string, error) {
 	tdTerraform := data.TerraformTmplData{
 		UserdataB64:  userdataB64,
 		LetsChatPort: opt.Port,
+		Status:       opt.Status,
 		StatusPort:   opt.StatusPort,
 		SSHAccess:    opt.SSHAccess,
 	}
@@ -40,6 +41,7 @@ func userData(opt *options) (string, error) {
 	var userdataB bytes.Buffer
 	tdUserdata := data.UserdataTmplData{
 		LetsChatPort:     opt.Port,
+		Status:           opt.Status,
 		StatusPort:       opt.StatusPort,
 		DockerComposeB64: dockerComposeB64,
 	}
