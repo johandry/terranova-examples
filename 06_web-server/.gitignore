@@ -1,0 +1,6 @@
+*.tfstate.*
+*.tfstate
+.terraform
+webserver
+*.tf
+main.tf
