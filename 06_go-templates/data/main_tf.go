@@ -2,7 +2,6 @@ package data
 
 // TerraformTmplData is the template data structure
 type TerraformTmplData struct {
-	UserdataB64  string
 	LetsChatPort string
 	Status       bool
 	StatusPort   string
@@ -33,8 +32,14 @@ resource "aws_instance" "letschat_server" {
   ami                    = "ami-0d1cd67c26f5fca19"
 	instance_type          = "t2.micro"
 	key_name      				 = "letschat_server_key"
-	vpc_security_group_ids = [ "${aws_security_group.letschat_server_ingress.id}" ]
-	user_data_base64       = "{{ .UserdataB64 }}"
+  vpc_security_group_ids = [ "${aws_security_group.letschat_server_ingress.id}" ]
+  user_data              = templatefile("${path.module}/user_data.sh", {
+    letschat_port       = {{ .LetsChatPort }},
+    status              = {{ .Status }},
+    status_port         = {{ .StatusPort }},
+    docker_compose_b64  = base64encode(templatefile("${path.module}/docker-compose.yaml",{ letschat_port = {{ .LetsChatPort }} })),
+  })
+	// user_data              = data.template_file.user_data.rendered
 
   tags = {
     Name = "terranova-example-letschat_server"
