@@ -1,0 +1,8 @@
+*.tfstate.*
+*.tfstate
+.terraform
+webserver
+*.tf
+main.tf
+letschat
+terraform_code

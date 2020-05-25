@@ -1,4 +1,5 @@
 tf
 terraform
+terractl
 *.state
 tmp/

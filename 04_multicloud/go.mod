@@ -1,4 +1,4 @@
-module github.com/johandry/terranova-examples/multicloud/vm
+module github.com/johandry/terranova-examples/04_multicloud/vm
 
 go 1.13
 
