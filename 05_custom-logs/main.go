@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/johandry/terranova"
-	mylog "github.com/johandry/terranova-examples/custom-logs/log"
+	mylog "github.com/johandry/terranova-examples/05_custom-logs/terractl/log"
 	"github.com/johandry/terranova/logger"
 	"github.com/terraform-providers/terraform-provider-aws/aws"
 )
