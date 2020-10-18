@@ -1,4 +1,6 @@
 *.pem
 terractl
-*.tfstate
 pkg/
+*.tfstate*
+terraform_code*
+.credentials*
