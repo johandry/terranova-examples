@@ -1,6 +1,6 @@
 module github.com/johandry/terranova-examples/06_go-templates/letschat
 
-go 1.14
+go 1.15
 
 require (
 	github.com/johandry/terranova v0.0.4
