@@ -1,10 +1,10 @@
 module github.com/johandry/terranova-examples/02_ec2/ec2
 
-go 1.13
+go 1.15
 
 require (
-	github.com/hashicorp/terraform v0.12.17
-	github.com/johandry/terranova v0.0.3
+	github.com/hashicorp/terraform v0.12.20
+	github.com/johandry/terranova v0.0.4
 	github.com/terraform-providers/terraform-provider-aws v1.60.1-0.20191003145700-f8707a46c6ec
 )
 
