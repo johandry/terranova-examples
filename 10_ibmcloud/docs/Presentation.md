@@ -1,14 +1,10 @@
 # Terranova: Using Terraform from Go
 
-https://github.com/johandry/terranova
-
 **Terranova** = **Terraform** + **Go**
-
-Terranova is a Go package that allows you to easily use the Terraform Go Packages instead of executing the Terraform binary
 
 ![](https://github.com/johandry/terranova/raw/master/images/terranova-160x160.png)
 
-## What is Go
+## What is Go?
 
 https://golang.org
 
@@ -38,17 +34,15 @@ Main features:
 * Simplicity and Consistency
 * Binaries
 * Powerful standard library
-* 
+* Package Management
 
-## What is Terraform
+## What is Terraform?
 
 https://www.terraform.io/
 
 ![](https://www.terraform.io/assets/images/logo-hashicorp-3f10732f.svg)
 
 *"Terraform is a tool for building, changing, and versioning infrastructure"*
-
-<img src="/Users/johandry/Workspace/johandry/terranova-examples/10_ibmcloud/docs/images/terraform.png" alt="terraform" style="zoom:25%;" />
 
 The **Infrastructure Code** is written in a custom domain-specific-language (DSL) called **HCL** (*Hashicorp Configuration Language*), it's similar to JSON and YAML. With HCL we write declarative definitions for the infrastructure we want to exist. Then the Terraform engine takes care of provisioning and updating resources.
 
@@ -114,7 +108,15 @@ In this example we did not build or provision any resource, this code just query
 
 To know more about Terraform, Infrastructure as Code on IBM Cloud, read: https://ibm.github.io/cloud-enterprise-examples/iac/content-overview and for the simplified examples, go to https://github.com/IBM/cloud-enterprise-examples/tree/master/iac 
 
-## What is Terranova
+## What is Terranova?
+
+https://github.com/johandry/terranova
+
+**Terranova** = **Terraform** + **Go**
+
+Terranova is a Go package that allows you to easily use the Terraform Go Packages instead of executing the Terraform binary
+
+![](https://github.com/johandry/terranova/raw/master/images/terranova-160x160.png)
 
 Terranova is a Go package to use Terraform in your Go code
 
@@ -237,4 +239,17 @@ go build -o terractl .
 
 ## Demo
 
-The example in this directory creates a instance and deploy a simple web application (Hello World)
+The example in this directory creates a instance and deploy LetsChat, a simple web chat application.
+
+After build or download the binary, execute:
+
+```bash
+# To view the Terraform code to execute:
+letschat --status --ssh-access --export
+
+# To create an instance with SSH Access
+letschat --status --ssh-access --cloud ibm
+
+# Destroy the instance
+letschat --destroy
+```
