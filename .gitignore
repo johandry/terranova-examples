@@ -4,3 +4,4 @@ pkg/
 *.tfstate*
 terraform_code*
 .credentials*
+.terraform_key*.json
