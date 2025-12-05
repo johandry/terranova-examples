@@ -6,7 +6,7 @@ require (
 	github.com/johandry/log v0.0.0-20190918193429-2b13006dd125
 	github.com/johandry/terranova v0.0.4
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.8.3
 	github.com/spf13/viper v1.4.0
 	github.com/terraform-providers/terraform-provider-aws v1.60.1-0.20191003145700-f8707a46c6ec
 )
